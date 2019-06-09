@@ -1,5 +1,8 @@
-#!/bin/bash
-#module load  imkl/11.2.3
-#module load  gcc/8.2.0
-module load   ips/2018u4
-#e52692v2ib!  
+#BSUB -q e52692v2ib
+#BSUB -n 48
+#BSUB -R largemem
+#BSUB -J MgSiO3
+#BSUB -o out
+#BSUB -e err
+module load ips/2018u4
+mpiexec ./dqmc.x
