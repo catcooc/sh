@@ -1,0 +1,19 @@
+qrd[x_] := 
+  Block[{q, d, r}, {q, r} = QRDecomposition[x]; 
+   d = DiagonalMatrix[Table[r[[i]][[i]], {i, Length@r}]]; 
+   r = Table[
+     r[[i]][[j]]/d[[i]][[i]], {i, Length@r}, {j, 
+      Length@r}]; {ConjugateTranspose[q], d, r}];
+ld[x_] := Block[{jg = dw}, Table[jg = jg.i, {i, x}]; jg];
+
+fxk[x_] := Table[ld[x[[i ;; i + 3]]], {i, m/2}];
+Svd[x_] := 
+  Block[{u, w, v, vp}, 
+   Nest[If[# == 1, {u, w, v} = SingularValueDecomposition[x[[-#]]]; 
+      v = Transpose@v; # + 1, {u, w, vp} = 
+       SingularValueDecomposition[x[[-#]].u.w]; vp = Transpose@vp; 
+      v = vp.v; # + 1] &, 1, Length@x]; {u, w, v}];
+Svdx[x_] := 
+  Block[{u, w, v, vp}, 
+   Nest[If[# == 1, {u, w, v} = qrd[x[[#]]]; # + 1, {u, w, vp} = 
+       qrd[x[[#]].u.w]; v = vp.v; # + 1] &, 1, Length@x]; {u, w, v}];
