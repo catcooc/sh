@@ -175,3 +175,32 @@ Qmc[U0_, bt0_, m0_, t0_, l0_, mu0_, warm_, o_] :=
     dt = bt0/m0, dw = IdentityMatrix[l0], 
     S = Table[RandomChoice[{1, -1}], m0, l0], Bd, Bs, Kmb, Kma, vs, 
     vd, G}, qs[1, U, bt, m, t, l, mu, 1]; yr[warm]; cl[o]];
+    
+    
+    
+    
+    gxjg = 3;
+U = 4;
+Gcs = {{0, 0}};
+rjs = {"ks"};
+error = {0};
+bt = {10, 8, 3, 1, 1/4, 4, 3, 2, 1/2};
+l = 6;
+m = 8*bt;
+mu = U/2;
+t = 1;
+warm = 5000;
+o = 5000;
+obs = Table[
+   Qmc[U, bt[[p]], m[[p]], t, l, mu, warm, o], {p, Length@bt}] // 
+  AbsoluteTiming
+  
+  jgs = Table[obs[[2]][[i]][[2 ;; -1]], {i, Length@bt}]
+nn = Table[{1/bt[[i]], jgs[[i]][[All, 1]] // Mean}, {i, Length@bt}];
+mmm = Table[{1/bt[[i]], jgs[[i]][[All, 2]] // Mean}, {i, Length@bt}];
+mmmm = Table[{1/bt[[i]], Abs[jgs[[i]][[All, 2]]] // Mean}, {i, 
+    Length@bt}];
+mzz = Table[{1/bt[[i]], Abs[jgs[[i]][[All, 3]]] // Mean}, {i, 
+    Length@bt}];
+mxx = Table[{1/bt[[i]], Abs[jgs[[i]][[All, 4]]] // Mean}, {i, 
+    Length@bt}];
