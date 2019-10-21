@@ -1,0 +1,128 @@
+ClearAll["Global`*"]
+k[l_, t_] := 
+  SparseArray[# -> 1 & /@ {{1, 2}, {1, l}, {l, 1}, {l, l - 1}, 
+     Sequence @@ (Table[{{i, i - 1}, {i, i + 1}}, {i, 2, l - 1}] // 
+        Flatten[#, 1] &)}];
+sdd[x_] := 
+  Block[{jg}, 
+   Nest[If[# == 0, jg = dw; # + 1, jg = Bd[[#]].jg; # + 1] &, 0, x];
+   jg];
+dds[x_] := 
+  Block[{jg}, 
+   Nest[If[# == 0, jg = Bd[[m - #]].dw; # + 1, 
+      jg = jg.Bd[[m - #]]; # + 1] &, 0, m - x + 1]; jg];
+gd[x_] := Inverse[dw + sdd[x].dds[x]];
+sdds[x_] := 
+  Block[{jg}, 
+   Nest[If[# == 0, jg = dw; # + 1, jg = Bs[[#]].jg; # + 1] &, 0, x];
+   jg];
+ddss[x_] := 
+  Block[{jg}, 
+   Nest[If[# == 0, jg = Bs[[m - #]].dw; # + 1, 
+      jg = jg.Bs[[m - #]]; # + 1] &, 0, m - x + 1]; jg];
+gs[x_] := Inverse[dw + sdds[x].ddss[x]];
+R[xs_, i_] := {1 + (1 - 
+       G[[1]][[i]][[i]]) (Exp[-2*lmd*-1*S[[xs]][[i]]] - 1), 
+   1 + (1 - G[[2]][[i]][[i]]) (Exp[-2 *lmd*S[[xs]][[i]]] - 1)};
+Upq[i_, xs_, cs_, dd_, r_] := 
+  Block[{gmd = Exp[-2 *lmd*1*S[[xs]][[i]]] - 1, 
+    gms = Exp[2 *lmd* 1* S[[xs]][[i]]] - 1, 
+    dww = Table[If[j == h == i, 1, 0], {h, l}, {j, l}]}, 
+   If[r == 1, 
+    If[Mod[cs, gxjg] == 0, qs[xs, U, bt, m, t, l, mu, 0], 
+     If[dd == 1, 
+      G[[1]] = 
+       Table[G[[1]][[h]][[
+          n]] - ((dww[[h]][[n]] - G[[1]][[h]][[i]]) gms G[[1]][[i]][[
+             n]])/(1 + (1 + G[[1]][[i]][[i]])*gms), {h, l}, {n, l}];
+      G[[2]] = 
+       Table[G[[2]][[h]][[
+          n]] - ((dww[[h]][[n]] - G[[2]][[h]][[i]]) gms G[[2]][[i]][[
+             n]])/(1 + (1 + G[[1]][[i]][[i]])*gms), {h, l}, {n, l}], 
+      G = {Bs[[xs]].G[[1]].Inverse[Bs[[xs]]], 
+        Bd[[xs]].G[[2]].Inverse[Bd[[xs]]]}; Print["up"]]]]];
+Nz[sx_] := 
+  If[sx == 1, 
+   Mean@Flatten[Table[1 - gs[i][[j]][[j]], {i, m}, {j, l}], 1], 
+   Mean@Flatten[Table[1 - gd[i][[j]][[j]], {i, m}, {j, l}], 1]];
+accpet[i_, xs_] := 
+  Block[{rrr = Times @@ R[xs, i]}, 
+   If[rrr > RandomReal[], 
+    If[rrr > 1 || rrr < 0, rjs = {Sequence @@ rjs, rrr}]; 
+    S[[xs]][[i]] = -S[[xs]][[i]]; 1, 0]];
+qs[yxs_, U0_, bt0_, m0_, t0_, l0_, mu0_, DT0_] := 
+  Block[{U = U0, bt = bt0, l = l0, m = m0, mu = mu0, t = t0, Gs, 
+    error}, lmd = Log[ (Sqrt[Exp[Abs[U] dt] - 1] + Exp[Abs[U] dt .5])];
+   vs = Table[lmd/dt S[[xs]][[i]] - mu + U 0.5, {xs, m}, {i, l}];
+   vd = Table[(-1 lmd)/dt S[[xs]][[i]] - mu + U 0.5, {xs, m}, {i, 
+      l}];
+   Kma = Table[If[EvenQ@i, k[l, 1][[i]], Table[0, l]], {i, l}] // 
+     Normal;
+   Kmb = Table[If[OddQ@i, k[l, 1][[i]], Table[0, l]], {i, l}] // 
+     Normal; Bd = 
+    Table[(Kma*Sinh[dt t] + dw Cosh[dt t]).(Kmb*Sinh[dt t] + 
+        dw Cosh[dt t]).(DiagonalMatrix@
+        Table[Exp[-dt vd[[xs]][[i]]], {i, l}]), {xs, m}];
+   Bs = Table[(Kma*Sinh[dt t] + dw Cosh[dt t]).(Kmb*Sinh[dt t] + 
+        dw Cosh[dt t]).(DiagonalMatrix@
+        Table[Exp[-dt vs[[xs]][[i]]], {i, l}]), {xs, m}];
+   If[DT0 == 1, G = {gs[yxs], gd[yxs]}; Print["start"]; 
+    error = {Sequence @@ error, "start"}, Gs = {gs[yxs], gd[yxs]}; 
+    error = {Sequence @@ error, Mean@Flatten[Abs[Gs - G], 1]};
+    G = Gs;]];
+yr[warm_] := 
+  Block[{cs = 0, r}, Print["warm"]; 
+   Nest[If[#[[1]] != l, r = accpet[Sequence @@ #];
+      Upq[Sequence@#, cs, 1, r]; cs = cs + 1; {#[[1]] + 1, #[[2]]}, 
+      If[#[[2]] != m, r = accpet[Sequence @@ #];
+       Upq[Sequence@#, cs, 2, r]; cs = cs + 1;
+       {1, #[[2]] + 1}, r = accpet[Sequence @@ #];
+       Upq[Sequence@#, cs, 1, r]; cs = cs + 1;
+       G = {gs[1], gd[1]}; {1, 1}]] &, {1, 1}, warm]];
+
+Gcc[r_] = If[r == 1, qscl[U, bt, m, t, l, mu];
+   Gc = Table[{gs[i], gd[i]}, {i, m}]];
+qscl[U0_, bt0_, m0_, t0_, l0_, mu0_] := 
+  Block[{U = U0, bt = bt0, l = l0, m = m0, mu = mu0, t = t0, Gs}, 
+   lmd = Log[(Sqrt[Exp[Abs[U] dt] - 1] + Exp[Abs[U] dt .5])];
+   vs = Table[lmd/dt*S[[xs]][[i]] - mu + U 0.5, {xs, m}, {i, l}];
+   vd = Table[(-1 lmd)/dt*S[[xs]][[i]] - mu + U 0.5, {xs, m}, {i, 
+      l}];
+   Kma = Table[If[EvenQ@i, k[l, 1][[i]], Table[0, l]], {i, l}] // 
+     Normal;
+   Kmb = Table[If[OddQ@i, k[l, 1][[i]], Table[0, l]], {i, l}] // 
+     Normal; 
+   Bd = Table[(Kma*Sinh[dt t] + dw Cosh[dt t]).(Kmb*Sinh[dt t] + 
+        dw Cosh[dt t]).(DiagonalMatrix@
+        Table[Exp[-dt vd[[xs]][[i]]], {i, l}]), {xs, m}];
+   Bs = Table[(Kma*Sinh[dt t] + dw Cosh[dt t]).(Kmb*Sinh[dt t] + 
+        dw Cosh[dt t]).(DiagonalMatrix@
+        Table[Exp[-dt vs[[xs]][[i]]], {i, l}]), {xs, m}];];
+Nz[sx_] := 
+  If[sx == 1, 
+   Mean@Flatten[Table[1 - Gc[[i]][[1]][[j]][[j]], {i, m}, {j, l}], 1],
+    Mean@Flatten[Table[1 - Gc[[i]][[2]][[j]][[j]], {i, m}, {j, l}], 
+     1]];
+cl[o_] := 
+  Block[{jg = {{ks, ks}}, cs = 0, r, Gc}, Gcc[1]; 
+   Gcs = {Sequence @@ Gcs, Gc}; Print["cl"];
+   G = {Gc[[1]][[1]], Gc[[1]][[2]]};
+   Nest[If[#[[1]] != l, r = accpet[Sequence @@ #]; Gcc[r]; 
+      G = {Gc[[#[[2]]]][[1]], Gc[[#[[2]]]][[2]]};
+      cs = cs + 1;
+      jg = {Sequence @@ jg, {Nz[1] + Nz[-1], 
+         Nz[1] - Nz[-1]}}; {#[[1]] + 1, #[[2]]}, 
+      If[#[[2]] != m, r = accpet[Sequence @@ #];
+       Gcc[r]; G = {Gc[[#[[2]]]][[1]], Gc[[#[[2]]]][[2]]}; cs = cs + 1;
+       jg = {Sequence @@ jg, {Nz[1] + Nz[-1], 
+          Nz[1] - Nz[-1]}}; {1, #[[2]] + 1}, 
+       r = accpet[Sequence @@ #]; Gcc[r]; cs = cs + 1;
+       G = {Gc[[1]][[1]], Gc[[1]][[2]]};
+       jg = {Sequence @@ jg, {Nz[1] + Nz[-1], Nz[1] - Nz[-1]}}; {1, 
+        1}]] &, {1, 1}, o]; jg];
+
+Qmc[U0_, bt0_, m0_, t0_, l0_, mu0_, warm_, o_] := 
+  Block[{U = U0, bt = bt0, l = l0, m = m0, mu = mu0, t = t0, 
+    dt = bt0/m0, dw = IdentityMatrix[l0], 
+    S = Table[RandomChoice[{1, -1}], m0, l0], Bd, Bs, Kmb, Kma, vs, 
+    vd, G}, qs[1, U, bt, m, t, l, mu, 1]; yr[warm]; cl[o]];
