@@ -28,7 +28,7 @@ gd[x_] :=
    zj = SingularValueDecomposition[
      Transpose[u].Transpose[Conjugate[v]] + 
       w]; (Transpose[Conjugate[v]].zj[[3]]).Table[
-     If[zj[[2]][[i]][[j]] != 0 && i = j, 
+     If[zj[[2]][[i]][[j]] != 0 && i == j, 
       zj[[2]][[i]][[j]] = 1/zj[[2]][[i]][[j]], zj[[2]][[i]][[j]]], {i,
        Length@zj[[2]]}, {j, 
       Length@zj[[2]]}].(Transpose[zj[[1]]].Transpose[u])];
@@ -39,7 +39,7 @@ gs[x_] :=
    zj = SingularValueDecomposition[
      Transpose[u].Transpose[Conjugate[v]] + 
       w]; (Transpose[Conjugate[v]].zj[[3]]).Table[
-     If[zj[[2]][[i]][[j]] != 0 && i = j, 
+     If[zj[[2]][[i]][[j]] != 0 && i == j, 
       zj[[2]][[i]][[j]] = 1/zj[[2]][[i]][[j]], zj[[2]][[i]][[j]]], {i,
        Length@zj[[2]]}, {j, 
       Length@zj[[2]]}].(Transpose[zj[[1]]].Transpose[u])];
