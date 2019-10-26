@@ -1,0 +1,45 @@
+Tp[x_, cs_] := 
+ NestList[If[BitGet[#, 0] == 1, BitSet[BitShiftRight[#, 1], l - 1], 
+    BitShiftRight[#, 1]] &, x, cs]
+Tpr[x_, cs_] := 
+ NestList[If[BitGet[#, l - 1] == 1, 
+    BitClear[BitSet[BitShiftLeft[#, 1], 0], l], BitShiftLeft[#, 1]] &,
+   x, cs]
+Tprs[x_, cs_, m_] := 
+ NestList[If[
+    BitGet[#[[2]], l - 1] == 1, {(-1)^(m - 1), 
+     BitClear[BitSet[BitShiftLeft[#[[2]], 1], 0], l]}, {1, 
+     BitShiftLeft[#[[2]], 1]}] &, {1, x}, cs]
+
+Sc[x_] := 
+ Block[{jg = {0}, jl}, 
+  Catch[Nest[
+    If[Length[#] == 0, Throw[jg], 
+      jl = DeleteDuplicates[Tpr[#[[1]], l - 1]]; 
+      jg = {Sequence @@ jg, {#[[1]], jl}}; xc[#, jl]] &, x, l - 1]]; 
+  jg[[2 ;; -1]]]
+RRR[x_, y_] := 
+ Flatten[Table[{i[[1]], #} & /@ 
+    Tpr[j[[1]], Min[Length[i[[2]]], Length[j[[2]]]] - 1], {i, x}, {j, 
+    y}], 2]
+xc[x_, y_] := 
+ Block[{jg = x}, 
+  Nest[(jg = DeleteCases[jg, y[[#]]]; # + 1) &, 1, Length@y]; jg]
+P[x_, kk_, m1_, m2_] := 
+ Table[{#[[1]][[1]]*#[[2]][[1]]*
+      Exp[2*Pi*kk*i* I /l]/l, {#[[1]][[2]], #[[2]][[2]]}} &@{Tprs[
+      x[[1]], i, m1][[-1]], Tprs[x[[2]], i, m2][[-1]]}, {i, 0, 
+   l - 1}]
+Rz = RRR[Sc[R1], Sc[R2]]
+Rz // Length
+pk = Table[P[i, j, m1, m2], {i, Rz}, {j, 0, l - 1}];
+sz[x_, y_] := Flatten[Position[x, y]];
+DeleteCases[Table[If[#[[i]] != 0, {#[[i]], Rz[[i]]}], {i, Length@Rz}],
+    Null] & /@ 
+ Table[Table[
+   Tr[i[[All, 1]][[#]] & /@ sz[i[[All, 2]], i[[All, 2]][[1]]]], {i, 
+    pk[[All, j]]}], {j, l}]
+end[x_] := 
+ Block[{js = x[[All, 2]], rk = x[[All, 1]], jsc = Length@js, 
+   rl = r[js], h = Table[0, jsc, jsc]}, 
+  Table[js[[i]], {i, jsc}, {j, jsc}]
