@@ -1,0 +1,57 @@
+ClearAll["Global`*"]
+jscs[x_, n_] := 
+  DeleteCases[
+   Table[If[DigitCount[j, 2, 1] == n, j], {j, 
+     Range[1, Tr@Table[2^(x - i), {i, n}]]}], Null];
+l = 4;
+m1 = 2;
+m2 = 2;
+R1 = jscs[l, m1];
+rr1 = Length[R1];
+R2 = jscs[l, m2];
+rr2 = Length[R2];
+h = Table[0, rr1*rr2, rr1*rr2];
+U = 0;
+t = 1;
+
+k[x_, i_, j_] := 
+  Block[{w1 = BitGet[x, i - 1], w2 = BitGet[x, j - 1]}, 
+   If[(w1 + w2) == 1, 
+    w1*BitClear[BitSet[x, j - 1], i - 1] + 
+     w2*BitClear[BitSet[x, i - 1], j - 1], "bx"]];
+zz[x_, y_] := rr2*(x - 1) + y;
+fk1[r_] := 
+  Block[{jg = 0, w}, 
+   Nest[(w = k[r, #, # + 1]; 
+      If[w != "bx", jg = {Sequence @@ jg, w}]; # + 1) &, 1, l - 1]; 
+   Flatten[jg]; jg[[2 ;; -1]]];
+fk2[r_] := 
+  Block[{jg = 0, w}, 
+   Nest[(w = k[r, #, # + 1]; 
+      If[w != "bx", jg = {Sequence @@ jg, w}]; # + 1) &, 1, l - 1]; 
+   jg[[2 ;; -1]]];
+f1[x_, y_] := Table[{i, y}, {i, x}];
+f2[x_, y_] := Table[{x, i}, {i, y}];
+js = Flatten[Table[{i, j}, {i, R1}, {j, R2}], 1];
+r[x_] := Table[x[[i]] -> i, {i, Length@x}];
+rl = r[js];
+
+h1[x_, y_] := 
+  Table[h[[x /. rl]][[i /. rl]] += -t, {i, 
+    If[Length@y == 2 && Length@Flatten@y == 2, {y}, y]}];
+fbj1[x_] := 
+  Block[{w = k[x[[1]], 1, l]}, 
+   If[w != "bx", h[[x /. rl]][[{w, x[[2]]} /. rl]] += (-1)^m1 t]];
+fbj2[x_] := 
+  Block[{w = k[x[[2]], 1, l]}, 
+   If[w != "bx", h[[x /. rl]][[{x[[1]], w} /. rl]] += (-1)^m2 t]];
+(*h2[x_,y_]:=Table[h[[zz[Sequence@@i]]][[zz[Sequence@@x]]]+=-t,{i,x}];\
+*)
+dcs[x_, y_] := 
+ Block[{r1 = Length@x, r2 = Length@y}, 
+  h1[Sequence @@ #] & /@ Table[{i, f1[fk1[i[[1]]], i[[2]]]}, {i, js}];
+   h1[Sequence @@ #] & /@ 
+   Table[{i, f2[i[[1]], fk2[i[[2]]]]}, {i, js}]; 
+  Table[fbj1[i]; fbj2[i], {i, js}];]
+dcs[R1, R2];
+h // MatrixPlot
