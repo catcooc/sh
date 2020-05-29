@@ -25,7 +25,7 @@ R[xs_, i_] := {1 + (1 -
        G[[2]][[i]][[i]]) (Exp[-2 lmd - 1 S[[xs]][[i]]] - 1), 
    1 + (1 - G[[1]][[i]][[i]]) (Exp[-2 lmd 1 S[[xs]][[i]]] - 1)};
 Upq[i_, xs_, cs_, dd_, r_] := 
-  Block[{gmd = Exp[-2 lmd - 1 S[[xs]][[i]]] - 1, 
+  Block[{gmd = Exp[-2 lmd -1 S[[xs]][[i]]] - 1, 
     gms = Exp[-2 lmd 1 S[[xs]][[i]]] - 1, 
     dww = Table[If[j == h == i, 1, 0], {h, l}, {j, l}]}, 
    If[r == 1, 
