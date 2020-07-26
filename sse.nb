@@ -1,0 +1,57 @@
+L = 12;
+l = 8;
+bt = 16;
+nb = l - 1;
+rule = {1 -> 2, 2 -> 1, 3 -> 4, 4 -> 3};
+vlast = Table[-1, l];
+vfirst = Table[-1, l];
+spin[l_] := Table[RandomInteger[], l];
+band[nb_, jg_] := {Range[nb], 
+   If[# > l, # - l, #] & /@ (Range[nb] + jg)};
+{li, lj} = band[l, 1];
+pinsert[n_] := (bt*nb)/(2*(L - n));
+premove[n_] := (2 (L - n + 1))/(bt *nb);
+diagonalup[gl_, sl_] := 
+  Block[{n = Total[If[# > 0, 1, 0] & /@ s], b, s = sl, g = gl}, 
+   Do[If[s[[i]] == 0, b = RandomInteger[nb - 1] + 1; 
+     If[g[[li[[b]]]] == g[[lj[[b]]]], Print["g"]; Continue[], 
+      If[RandomReal[] < pinsert[n], Print[s[[i]]]; s[[i]] = 2*b; 
+       n = n + 1]], 
+     If[Mod[s[[i]], 2] == 0, 
+      If[RandomReal[] < premove[n], s[[i]] = 0; n = n - 1], 
+      b = Quotient[s[[i]], 2], g[[li[[b]]]] = -g[[li[[b]]]]; 
+      g[[lj[[b]]]] = -g[[lj[[b]]]]]], {i, L}]; {g, s}];
+linkcreat[gl_, sl_, vf_, vl_] := 
+  Block[{g = gl, s = sl, vff = vf, vll = vl, xlist = Table[-1, L*4], 
+    v0, i1, i2, b, v1, v2}, 
+   Do[If[s[[i]] == 0, Continue[], v0 = 4 i - 3; 
+     b = Quotient[s[[i]], 2]; i1 = li[[b]]; i2 = lj[[b]]; 
+     v1 = vll[[i1]]; v2 = vll[[i2]]]; 
+    If[v1 != -1, xlist[[v1]] = v0; xlist[[v0]] = v1, vff[[i1]] = v0]; 
+    If[v2 != -1, xlist[[v2]] = v0 + 1; xlist[[v0 + 1]] = v2, 
+     vff[[i2]] = (v0 + 1)]; vll[[i1]] = v0 + 2; 
+    vll[[i2]] = v0 + 3, {i, L}]; 
+   Do[i1 = vff[[i]]; 
+    If[i1 != -1, i2 = vll[[i]]; xlist[[i2]] = i1; 
+     xlist[[i1]] = i2], {i, l}]; {vll, vff, xlist}];
+loopup[gl_, sl_, xl_, vf_] := 
+ Block[{x = xl, g = gl, s = sl, vz, p, v}, 
+  Do[If[x[[i]] < 0, Continue[]]; v = i; 
+   If[RandomReal[] < 1/2, 
+    Do[p = v/4; x[[v]] = -1; v = i /. rule; vz = v; v = x[[v]]; 
+     x[[vz]] = -1; If[v == i, Break], 10000000], 
+    Do[p = v/4; 
+     s[[p]] = If[Mod[s[[p]], 2] == 0, s[[p]] + 1, s[[p]] - 1]; 
+     x[[v]] = -2; v = i /. rule; vz = v; v = x[[v]]; x[[vz]] = -2; 
+     If[v == i, Break], 10000000]; 
+    Do[v = vff[[nn]], 
+     If[v == -1, If[RandomReal[] < 1/2, g[[nn]] = -g[[nn]]], 
+      If[x[[nn]] == -2, g[[nn]] = -g[[nn]]], {nn, l}], {i, 1, 4*L, 
+      2}]], {i, L}]; {g, s, x}]
+      
+      
+ g = {1, 1, 0, 0, 1, 0, 1, 0}; s = {14, 9, 0, 13, 4, 0, 0, 6, 13, 9, 0,
+   4};
+cs=linkcreat[g,s,vfirst,vlast]
+lb[x_]:=Table[x[[4*i-4+j]],{i,12},{j,4}]
+(lb[cs[[3]]]-1)//MatrixForm
